@@ -1,3 +1,0 @@
-[submodule "nixfiles"]
-	path = nixfiles
-	url = git@github.com:MonashNovaRover/nixfiles.git
