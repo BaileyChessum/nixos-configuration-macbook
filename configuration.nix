@@ -4,6 +4,9 @@
 
 { config, lib, pkgs, ... }:
 
+let 
+  waylandUrl = "https://github.com/nix-community/nixpkgs-wayland/archive/master.tar.gz";
+in
 {
   imports =
     [ # Include the results of the hardware scan.
@@ -25,6 +28,11 @@
   ];
 
   nix.settings.trusted-substituters = [
+    "https://cuda-maintainers.cachix.org"
+    "https://ros.cachix.org"
+    "https://hyprland.cachix.org"
+    "https://cache.nixos.org/"
+    "https://nixpkgs-wayland.cachix.org"
     "https://cache.soopy.moe"
     "https://hydra.novarover.space"
   ];
@@ -39,6 +47,11 @@
     "cache.soopy.moe-1:0RZVsQeR+GOh0VQI9rvnHz55nVXkFardDqfm4+afjPo="
     "nova-1:lRJ8YVtMKF5G7fk1OUx4vFyupTCwA4RrMNTX4JH7Hig="
   ];
+
+  nixpkgs.overlays = [
+    (import "${(builtins.fetchTarball waylandUrl)}/overlay.nix")
+  ];
+  nixpkgs.config.allowUnfree = true;
 
   # Use the systemd-boot EFI boot loader.
   #boot.loader.systemd-boot.enable = true;
@@ -73,8 +86,11 @@
   # Enable the X11 windowing system.
   services.xserver.enable = true;
 
+  # Enable the GNOME desktop environment
   services.xserver.displayManager.gdm.enable = true;
   services.xserver.desktopManager.gnome.enable = true;
+
+  services.xserver.videoDrivers = [ "modesetting" ];
 
   # Nova profile configuration
   nova.profile = "shared";
@@ -105,6 +121,11 @@
       "obsidian.desktop"
     ];
 
+    # Adds HiDPI scaling support
+    dconf.settings."org/gnome/mutter".experimental-features = [ 
+      "scale-monitor-framebuffer" 
+    ];
+
     programs.git = lib.mkForce {
       enable = true;
       userName = "Bailey Chessum";
@@ -113,8 +134,16 @@
   };
   nova.desktop.browser.enable = lib.mkForce false;
 
-  
-
+  # --- Wayland --- #
+  environment.sessionVariables.NIXOS_OZONE_WL = "1";  # for chromium/electron
+  xdg = {
+    portal = {
+      enable = true;
+      extraPortals = with pkgs; [
+        xdg-desktop-portal-wlr
+      ];
+    };
+  };
 
   # Configure keymap in X11
   # services.xserver.xkb.layout = "us";
