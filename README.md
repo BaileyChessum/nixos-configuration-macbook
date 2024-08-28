@@ -1,10 +1,6 @@
-Extract the tarball contents to /lib/firmware/brcm in Linux and run the following in the Linux terminal:
 
-```bash
-sudo modprobe -r brcmfmac_wcc
-sudo modprobe -r brcmfmac
-sudo modprobe brcmfmac
-sudo modprobe -r hci_bcm4377
-sudo modprobe hci_bcm4377
-```
+# Bailey's 2019 Macbook Pro NixOS configuration with t2linux
+This configuration depends on other private repositories. Don't try to use it!
+
+Putting this on version control made adding firmware for Wi-Fi and Bluetooth super simple. I followed method 2 in [this guide](https://wiki.t2linux.org/tools/firmware.sh) to get [./firmware.tar](./firmware.tar).
 
