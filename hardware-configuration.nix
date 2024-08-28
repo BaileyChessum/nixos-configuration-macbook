@@ -36,6 +36,19 @@
   networking.useDHCP = lib.mkDefault true;
   # networking.interfaces.enp2s0f1u1.useDHCP = lib.mkDefault true;
 
+  hardware.firmware = [
+    (pkgs.stdenvNoCC.mkDerivation (final: {
+      name = "brcm-firmware";
+      src = ./firmware.tar;
+
+      dontUnpack = true;
+      installPhase = ''
+        mkdir -p $out/lib/firmware/brcm
+        tar -xf ${final.src} -C $out/lib/firmware/brcm
+      '';
+    }))
+  ];
+
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
 }
