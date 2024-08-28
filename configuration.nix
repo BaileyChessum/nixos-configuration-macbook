@@ -102,7 +102,7 @@ in
 
   # Customize
   home-manager.users.nova = {
-    home.packages = with pkgs;  [
+    home.packages = with pkgs; [
       #add your software here
       #e.g. slack
       slack
@@ -111,6 +111,8 @@ in
       zoom-us
       discord
       blackbox-terminal
+      jetbrains.pycharm-professional
+      jetbrains.webstorm
     ];
 
     # Adding to the task bar
@@ -161,7 +163,17 @@ in
   #};
 
   # Enable touchpad support (enabled default in most desktopManager).
-  services.libinput.enable = true;
+  # services.libinput = {
+  #   enable = true;
+  #   touchpad = {
+  #     # Enable naturalScrolling in touchpads
+  #     naturalScrolling = true;
+  #   };
+  #   touchpad = {
+  #     # Only for mouse, set accel profile to flat
+  #     accelProfile = "adaptive";
+  #   };
+  # };
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   #users.users.bailey = {
@@ -173,9 +185,8 @@ in
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
-  environment.systemPackages = with pkgs; [
-    vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-  ];
+  environment.systemPackages = with pkgs; [ # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+  ]; 
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
