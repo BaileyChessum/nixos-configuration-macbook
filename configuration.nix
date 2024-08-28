@@ -84,6 +84,29 @@
   }];
   home-manager.backupFileExtension = "backup";
 
+  # Customize
+  home-manager.users.nova = {
+    home.packages = with pkgs;  [
+      #add your software here
+      #e.g. slack
+      slack
+      brave  
+      obsidian
+      zoom-us
+      discord
+      blackbox-terminal
+    ];
+
+    # Adding to the task bar
+    dconf.settings."org/gnome/shell".favorite-apps = [
+      "brave-browser.desktop"
+      "slack.desktop"
+      "com.raggesilver.BlackBox.desktop"
+      "obsidian.desktop"
+    ];
+  };
+  nova.desktop.browser.enable = lib.mkForce false;
+
   # Configure keymap in X11
   # services.xserver.xkb.layout = "us";
   # services.xserver.xkb.options = "eurosign:e,caps:escape";
@@ -114,12 +137,7 @@
   # $ nix search wget
   environment.systemPackages = with pkgs; [
     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-    blackbox-terminal
-    brave  
-    slack
-    obsidian
-    zoom-us
-    discord
+    
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
