@@ -104,8 +104,17 @@
       "com.raggesilver.BlackBox.desktop"
       "obsidian.desktop"
     ];
+
+    programs.git = lib.mkForce {
+      enable = true;
+      userName = "Bailey Chessum";
+      userEmail = "bailey.chessum1@gmail.com";
+    };
   };
   nova.desktop.browser.enable = lib.mkForce false;
+
+  
+
 
   # Configure keymap in X11
   # services.xserver.xkb.layout = "us";
