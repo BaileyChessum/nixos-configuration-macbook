@@ -115,6 +115,7 @@ in
       jetbrains.pycharm-professional
       jetbrains.webstorm
       obs-studio
+      prismlauncher
     ];
 
     # Adding to the task bar
