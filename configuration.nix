@@ -50,6 +50,7 @@ in
 
   nixpkgs.overlays = [
     (import "${(builtins.fetchTarball waylandUrl)}/overlay.nix")
+    (import ./overlays/zoom-us-fix.nix)
   ];
   nixpkgs.config.allowUnfree = true;
 
@@ -113,6 +114,7 @@ in
       blackbox-terminal
       jetbrains.pycharm-professional
       jetbrains.webstorm
+      obs-studio
     ];
 
     # Adding to the task bar
@@ -147,27 +149,26 @@ in
     };
   };
 
-
   # Suspend Workaround
   # https://wiki.t2linux.org/guides/postinstall/#suspend-workaround
   systemd.services.suspend-fix-t2 = {
-    path = [  ];
     description = "Disable and Re-Enable Apple BCE Module (and Wi-Fi)";
 
-    serviceConfig = { 
-      # TODO: Do rmmod and modprobe need to be declaratively defined?
-      ExecStart = "/run/current-system/sw/bin/rmmod -f apple-bce";
-      ExecEnd = "/run/current-system/sw/bin/modprobe -f apple-bce";
-
-      # TODO: What are these, and do we insert them like this?
+    unitConfig = { 
       StopWhenUnneeded = "yes";
-      RemainAfterExit = "yes";
     };
 
+    serviceConfig = { 
+      User = "root";
+      RemainAfterExit = "yes";
+
+      # TODO: Do rmmod and modprobe need to be declaratively defined?
+      ExecStart = "/run/current-system/sw/bin/rmmod -f apple-bce";
+      ExecStop = "/run/current-system/sw/bin/modprobe apple-bce";
+    };
+ 
     before = [ "sleep.target" ];
     wantedBy = [ "sleep.target" ]; 
-    partOf = [ "graphical-session.target" ];
-    serviceConfig.PassEnvironment = "DISPLAY"; 
   };
 
   # Configure keymap in X11
@@ -178,12 +179,19 @@ in
   # services.printing.enable = true;
 
   # Enable sound.
-  # hardware.pulseaudio.enable = true;
-  # OR
-  #services.pipewire = {
-    #enable = true;
-    #pulse.enable = true;
-  #};
+  security.rtkit.enable = true;
+  services.pipewire = {
+      enable = true;
+      audio.enable = true;
+      pulse.enable = true;
+      alsa = {
+        enable = true;
+        support32Bit = true;
+      };
+      jack.enable = true;
+    };
+
+  hardware.pulseaudio.enable = false;
 
   # Enable touchpad support (enabled default in most desktopManager).
   # services.libinput = {
