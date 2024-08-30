@@ -147,6 +147,29 @@ in
     };
   };
 
+
+  # Suspend Workaround
+  # https://wiki.t2linux.org/guides/postinstall/#suspend-workaround
+  systemd.services.suspend-fix-t2 = {
+    path = [  ];
+    description = "Disable and Re-Enable Apple BCE Module (and Wi-Fi)";
+
+    serviceConfig = { 
+      # TODO: Do rmmod and modprobe need to be declaratively defined?
+      ExecStart = "/run/current-system/sw/bin/rmmod -f apple-bce";
+      ExecEnd = "/run/current-system/sw/bin/modprobe -f apple-bce";
+
+      # TODO: What are these, and do we insert them like this?
+      StopWhenUnneeded = "yes";
+      RemainAfterExit = "yes";
+    };
+
+    before = [ "sleep.target" ];
+    wantedBy = [ "sleep.target" ]; 
+    partOf = [ "graphical-session.target" ];
+    serviceConfig.PassEnvironment = "DISPLAY"; 
+  };
+
   # Configure keymap in X11
   # services.xserver.xkb.layout = "us";
   # services.xserver.xkb.options = "eurosign:e,caps:escape";
