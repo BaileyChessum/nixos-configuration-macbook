@@ -49,7 +49,7 @@ in
   ];
 
   nixpkgs.overlays = [
-    #(import "${(builtins.fetchTarball waylandUrl)}/overlay.nix")
+    (import "${(builtins.fetchTarball waylandUrl)}/overlay.nix")
     (import ./overlays/zoom-us-fix.nix)
   ];
   nixpkgs.config.allowUnfree = true;
@@ -92,7 +92,7 @@ in
   services.xserver.desktopManager.gnome.enable = true;
 
   # Disable wayland
-  services.xserver.displayManager.gdm.wayland = lib.mkForce false;
+  # services.xserver.displayManager.gdm.wayland = lib.mkForce false;
 
   services.xserver.videoDrivers = [ "modesetting" ];
 
@@ -130,9 +130,9 @@ in
     ];
 
     # Adds HiDPI scaling support
-    #dconf.settings."org/gnome/mutter".experimental-features = [ 
-    #  "scale-monitor-framebuffer" 
-    #];
+    dconf.settings."org/gnome/mutter".experimental-features = [ 
+      "scale-monitor-framebuffer" 
+    ];
 
     programs.git = lib.mkForce {
       enable = true;
@@ -143,7 +143,7 @@ in
   nova.desktop.browser.enable = lib.mkForce false;
 
   # --- Wayland --- #
-  #environment.sessionVariables.NIXOS_OZONE_WL = "1";  # for chromium/electron
+  environment.sessionVariables.NIXOS_OZONE_WL = "1";  # for chromium/electron
   xdg = {
     portal = {
       enable = true;
@@ -194,7 +194,6 @@ in
     };
     # jack.enable = true;
   };
-
   hardware.pulseaudio.enable = false;
 
   # Enable touchpad support (enabled default in most desktopManager).
@@ -209,6 +208,9 @@ in
   #     accelProfile = "adaptive";
   #   };
   # };
+
+  # trying for touchscreen
+  hardware.sensor.iio.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   #users.users.bailey = {
