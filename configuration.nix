@@ -49,7 +49,7 @@ in
   ];
 
   nixpkgs.overlays = [
-    (import "${(builtins.fetchTarball waylandUrl)}/overlay.nix")
+    #(import "${(builtins.fetchTarball waylandUrl)}/overlay.nix")
     (import ./overlays/zoom-us-fix.nix)
   ];
   nixpkgs.config.allowUnfree = true;
@@ -91,6 +91,9 @@ in
   services.xserver.displayManager.gdm.enable = true;
   services.xserver.desktopManager.gnome.enable = true;
 
+  # Disable wayland
+  services.xserver.displayManager.gdm.wayland = lib.mkForce false;
+
   services.xserver.videoDrivers = [ "modesetting" ];
 
   # Nova profile configuration
@@ -127,9 +130,9 @@ in
     ];
 
     # Adds HiDPI scaling support
-    dconf.settings."org/gnome/mutter".experimental-features = [ 
-      "scale-monitor-framebuffer" 
-    ];
+    #dconf.settings."org/gnome/mutter".experimental-features = [ 
+    #  "scale-monitor-framebuffer" 
+    #];
 
     programs.git = lib.mkForce {
       enable = true;
@@ -140,7 +143,7 @@ in
   nova.desktop.browser.enable = lib.mkForce false;
 
   # --- Wayland --- #
-  environment.sessionVariables.NIXOS_OZONE_WL = "1";  # for chromium/electron
+  #environment.sessionVariables.NIXOS_OZONE_WL = "1";  # for chromium/electron
   xdg = {
     portal = {
       enable = true;
@@ -182,15 +185,15 @@ in
   # Enable sound.
   security.rtkit.enable = true;
   services.pipewire = {
+    enable = true;
+    audio.enable = true;
+    pulse.enable = true;
+    alsa = {
       enable = true;
-      audio.enable = true;
-      pulse.enable = true;
-      alsa = {
-        enable = true;
-        support32Bit = true;
-      };
-      jack.enable = true;
+      support32Bit = true;
     };
+    # jack.enable = true;
+  };
 
   hardware.pulseaudio.enable = false;
 
