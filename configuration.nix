@@ -50,7 +50,7 @@ in
 
   nixpkgs.overlays = [
     (import "${(builtins.fetchTarball waylandUrl)}/overlay.nix")
-    (import ./overlays/zoom-us-fix.nix)
+    #(import ./overlays/zoom-us-fix.nix)
   ];
   nixpkgs.config.allowUnfree = true;
 
@@ -63,6 +63,8 @@ in
     efi.canTouchEfiVariables = true;
     systemd-boot.enable = true;
   };
+
+  nix.settings.experimental-features = [ "nix-command" ];
 
   # networking.hostName = "nixos"; # Define your hostname.
   # Pick only one of the below networking options.
@@ -104,22 +106,29 @@ in
   }];
   home-manager.backupFileExtension = "backup";
 
+  programs.steam = {
+    enable = true;
+  };
+  programs.gamemode.enable = true;
+
   # Customize
   home-manager.users.nova = {
     home.packages = with pkgs; [
-      #add your software here
-      #e.g. slack
+      # Add your software here
       slack
-      brave  
+      brave
       obsidian
       zoom-us
-      discord
       blackbox-terminal
       jetbrains.pycharm-professional
       jetbrains.webstorm
       obs-studio
-      prismlauncher
+      webcord
     ];
+
+    home.shellAliases = {
+      hydra = "ssh -i ~/nova-oracle.key root@hydra.novarover.space";
+    };
 
     # Adding to the task bar
     dconf.settings."org/gnome/shell".favorite-apps = [
