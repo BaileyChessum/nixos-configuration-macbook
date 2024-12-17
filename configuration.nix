@@ -127,6 +127,7 @@ in
       jetbrains.webstorm
       obs-studio
       webcord
+      nix-output-monitor
     ];
 
     home.shellAliases = {
@@ -149,10 +150,8 @@ in
 
       "org/gnome/desktop/screensaver/" = {
         # Make it wait 15 minutes before auto-locking the computer
-        lock-delay = lib.hm.gvariant.mkUint32 900;
+        #lock-delay = lib.hm.gvariant.mkUint32 900;
       };
-
-      ""
     };
 
     programs.git = lib.mkForce {
@@ -162,6 +161,13 @@ in
     };
   };
   nova.desktop.browser.enable = lib.mkForce false;
+
+  # Remap CAPS lock to ESC
+  services.udev.extraHwdb = ''
+    evdev:atkbd:*
+      KEYBOARD_KEY_3a=esc
+  '';
+
 
   # --- Wayland --- #
   environment.sessionVariables.NIXOS_OZONE_WL = "1";  # for chromium/electron
@@ -173,29 +179,40 @@ in
       ];
     };
   };
-
+  
   # Suspend Workaround
   # https://wiki.t2linux.org/guides/postinstall/#suspend-workaround
-  systemd.services.suspend-fix-t2 = {
-    description = "Disable and Re-Enable Apple BCE Module (and Wi-Fi)";
+  # systemd.services.suspend-fix-t2 = {
+  #   description = "Disable and Re-Enable Apple BCE Module (and Wi-Fi)";
 
-    unitConfig = { 
-      StopWhenUnneeded = "yes";
-    };
+  #   unitConfig = { 
+  #     StopWhenUnneeded = "yes";
+  #   };
 
-    serviceConfig = { 
-      User = "root";
-      RemainAfterExit = "yes";
+  #   serviceConfig = { 
+  #     User = "root";
+  #     RemainAfterExit = "yes";
 
-      # TODO: Do rmmod and modprobe need to be declaratively defined?
-      ExecStart = "/run/current-system/sw/bin/rmmod -f apple-bce";
-      ExecStop = "/run/current-system/sw/bin/modprobe apple-bce";
-    };
+  #     # TODO: Do rmmod and modprobe need to be declaratively defined?
+  #     ExecStart = "/run/current-system/sw/bin/rmmod -f apple-bce";
+  #     ExecStop = "/run/current-system/sw/bin/modprobe apple-bce";
+  #   };
  
-    before = [ "sleep.target" ];
-    wantedBy = [ "sleep.target" ]; 
-  };
+  #   before = [ "sleep.target" ];
+  #   wantedBy = [ "sleep.target" ]; 
+  # };
 
+  # make the laptop use s2idle to prevent closing the lid from cooking it
+  boot.kernelParams = [ "mem_sleep_default=s2idle" ];
+
+  # Just give up and disable suspend
+  # systemd.sleep.extraConfig = ''
+  #   AllowSuspend=no
+  #   AllowHibernation=no
+  #   AllowHybridSleep=no
+  #   AllowSuspendThenHibernate=no
+  # '';
+  
   # Configure keymap in X11
   # services.xserver.xkb.layout = "us";
   # services.xserver.xkb.options = "eurosign:e,caps:escape";
