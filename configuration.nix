@@ -220,6 +220,20 @@ in
   # Enable CUPS to print documents.
   # services.printing.enable = true;
 
+  services.keyd = {
+    enable = true;
+    keyboards = {
+      default = {
+        ids = [ "*" ];
+        settings = {
+          main = {
+            capslock = "esc";
+          };
+        };
+      };
+    };
+  };
+
   # Enable sound.
   security.rtkit.enable = true;
   services.pipewire = {
