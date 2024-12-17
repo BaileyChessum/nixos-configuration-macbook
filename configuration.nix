@@ -13,6 +13,9 @@ in
       ./hardware-configuration.nix
       ./nixfiles/nixos
       "${builtins.fetchGit { url = "https://github.com/NixOS/nixos-hardware.git"; }}/apple/t2"
+
+      # All other custom imports are encapsulated here
+      ./imports
     ];
 
   nix.settings.keep-outputs = true;
@@ -130,18 +133,27 @@ in
       hydra = "ssh -i ~/nova-oracle.key root@hydra.novarover.space";
     };
 
-    # Adding to the task bar
-    dconf.settings."org/gnome/shell".favorite-apps = [
-      "brave-browser.desktop"
-      "slack.desktop"
-      "com.raggesilver.BlackBox.desktop"
-      "obsidian.desktop"
-    ];
+    dconf.settings = {
+      # Adding to the task bar
+      "org/gnome/shell".favorite-apps = [
+        "brave-browser.desktop"
+        "slack.desktop"
+        "com.raggesilver.BlackBox.desktop"
+        "obsidian.desktop"
+      ];
 
-    # Adds HiDPI scaling support
-    dconf.settings."org/gnome/mutter".experimental-features = [ 
-      "scale-monitor-framebuffer" 
-    ];
+      # Adds HiDPI scaling support
+      "org/gnome/mutter".experimental-features = [ 
+        "scale-monitor-framebuffer" 
+      ];
+
+      "org/gnome/desktop/screensaver/" = {
+        # Make it wait 15 minutes before auto-locking the computer
+        lock-delay = lib.hm.gvariant.mkUint32 900;
+      };
+
+      ""
+    };
 
     programs.git = lib.mkForce {
       enable = true;
