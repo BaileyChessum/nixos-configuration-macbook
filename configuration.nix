@@ -77,6 +77,9 @@ in
   # Set your time zone.
   time.timeZone = "Australia/Melbourne";
 
+  virtualisation.docker.enable = true;
+  users.extraGroups.docker.members = [ "nova" ];
+
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
   # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
@@ -96,6 +99,10 @@ in
   services.xserver.displayManager.gdm.enable = true;
   services.xserver.desktopManager.gnome.enable = true;
 
+  programs.bash = {
+    blesh.enable = true;
+  };
+  
   # Disable wayland
   # services.xserver.displayManager.gdm.wayland = lib.mkForce false;
 
@@ -109,10 +116,12 @@ in
   }];
   home-manager.backupFileExtension = "backup";
 
-  programs.steam = {
-    enable = true;
-  };
-  programs.gamemode.enable = true;
+  nova.workspace.enable = false;
+
+  # programs.steam = {
+  #   enable = true;
+  # };
+  # programs.gamemode.enable = true;
 
   # Customize
   home-manager.users.nova = {
@@ -125,9 +134,15 @@ in
       blackbox-terminal
       jetbrains.pycharm-professional
       jetbrains.webstorm
-      obs-studio
+      jetbrains.clion
       webcord
       nix-output-monitor
+      obs-cmd
+      ghostty
+      docker-compose
+
+      #unityhub
+      #jetbrains.rider  # or another appropriate IDE
     ];
 
     home.shellAliases = {
@@ -139,7 +154,7 @@ in
       "org/gnome/shell".favorite-apps = [
         "brave-browser.desktop"
         "slack.desktop"
-        "com.raggesilver.BlackBox.desktop"
+        "com.mitchellh.ghostty.desktop"
         "obsidian.desktop"
       ];
 
@@ -159,14 +174,31 @@ in
       userName = "Bailey Chessum";
       userEmail = "bailey.chessum1@gmail.com";
     };
+
+    programs.bash = {
+      initExtra = ''
+        source ${pkgs.blesh}/share/blesh/ble.sh
+        bleopt complete_auto_delay=300
+      '';
+    };
+
+    programs.obs-studio = {
+      enable = true;
+      plugins = with pkgs.obs-studio-plugins; [
+        obs-websocket
+      ];
+    };
+
+    # extraGroups = [ "docker" ];
   };
   nova.desktop.browser.enable = lib.mkForce false;
 
-  # Remap CAPS lock to ESC
-  services.udev.extraHwdb = ''
-    evdev:atkbd:*
-      KEYBOARD_KEY_3a=esc
-  '';
+  
+  # KEYBOARD_KEY_7d=a
+  # fn 
+  # control 29 
+  # alt 56
+  # left meta? 125
 
 
   # --- Wayland --- #
@@ -220,14 +252,37 @@ in
   # Enable CUPS to print documents.
   # services.printing.enable = true;
 
+  services.gnome.gnome-remote-desktop.enable = lib.mkForce false;
+
+  # prevent keyd from messing with the trackpad
+  services.udev.extraRules = ''
+    SUBSYSTEM=="input", ATTRS{name}=="*Keyboard*", ENV{ID_INPUT_KEYBOARD}="1"
+    SUBSYSTEM=="input", ATTRS{name}=="*Trackpad*", ENV{ID_INPUT_KEYBOARD}="0"
+  '';
+
   services.keyd = {
     enable = true;
     keyboards = {
-      default = {
+      # default = {
+      #   ids = [ "*" ];
+      #   settings = {
+      #     main = {
+      #       capslock = "esc";
+      #     };
+      #   };
+      # };
+      # Make the internal mac keyboard behave similarly to my desktop keyboard
+      macbook_internal = {
+        #ids = [ "05ac:027b" ];  # Only apply to internal MacBook keyboard----------------------------
         ids = [ "*" ];
         settings = {
           main = {
             capslock = "esc";
+            fn = "leftcontrol";
+            leftalt = "leftmeta";
+            leftmeta = "leftalt";
+            rightalt = "fn";
+            rightmeta = "sysrq";
           };
         };
       };
@@ -247,6 +302,10 @@ in
     # jack.enable = true;
   };
   hardware.pulseaudio.enable = false;
+  peripherals.realsense.enable = lib.mkForce false;
+
+  hardware.xone.enable = true;
+
 
   # Enable touchpad support (enabled default in most desktopManager).
   # services.libinput = {
@@ -263,6 +322,7 @@ in
 
   # trying for touchscreen
   hardware.sensor.iio.enable = true;
+
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   #users.users.bailey = {
@@ -319,6 +379,11 @@ in
   #
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
   system.stateVersion = "24.11"; # Did you read the comment?
+
+  nixpkgs.config.permittedInsecurePackages = [
+    "intel-media-sdk-23.2.2"
+    "libxml2-2.13.8"
+  ];
 
 }
 
